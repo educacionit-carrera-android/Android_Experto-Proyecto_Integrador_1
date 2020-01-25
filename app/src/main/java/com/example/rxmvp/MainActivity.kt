@@ -5,9 +5,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class MainActivity : AppCompatActivity() {
+
+    val compositeDisposable = CompositeDisposable()
 
     private lateinit var adapter: PostsAdapter
     private lateinit var api: MyApi
@@ -33,19 +36,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun retrievePosts() {
-        api.getPosts()
+        compositeDisposable.add(
+            api.getPosts()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { posts ->
+                        posts?.let {
+                            adapter.posts = posts
+                            adapter.notifyDataSetChanged()
+                        }
+                    },
+                    { Toast.makeText(this@MainActivity, it.message, Toast.LENGTH_LONG).show() }
 
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { posts ->
-                    posts?.let {
-                        adapter.posts = posts
-                        adapter.notifyDataSetChanged()
-                    }
-                },
-                { Toast.makeText(this@MainActivity, it.message, Toast.LENGTH_LONG).show() }
+                )
+        )
+    }
 
-            )
+    override fun onStop() {
+        super.onStop()
+        compositeDisposable.clear()
     }
 }
