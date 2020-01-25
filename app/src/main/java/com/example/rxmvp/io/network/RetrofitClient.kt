@@ -1,4 +1,4 @@
-package com.example.rxmvp
+package com.example.rxmvp.io.network
 
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory

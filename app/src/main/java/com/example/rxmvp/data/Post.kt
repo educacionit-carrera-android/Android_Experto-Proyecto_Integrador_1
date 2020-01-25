@@ -1,4 +1,4 @@
-package com.example.rxmvp
+package com.example.rxmvp.data
 
 import com.squareup.moshi.JsonClass
 

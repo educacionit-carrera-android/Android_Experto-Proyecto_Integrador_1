@@ -1,10 +1,12 @@
-package com.example.rxmvp
+package com.example.rxmvp.view
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.rxmvp.R
+import com.example.rxmvp.data.Post
 
 class PostsAdapter : RecyclerView.Adapter<PostsAdapter.PostsViewHolder>() {
 
