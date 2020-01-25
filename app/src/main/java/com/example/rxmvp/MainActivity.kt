@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,18 +33,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun retrievePosts() {
-        val callGetPosts = api.getPosts()
-        callGetPosts.enqueue(object : Callback<List<Post>> {
-            override fun onFailure(call: Call<List<Post>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_LONG).show()
-            }
+        api.getPosts()
 
-            override fun onResponse(call: Call<List<Post>>, response: Response<List<Post>>) {
-                response.body()?.let {
-                    adapter.posts = it
-                    adapter.notifyDataSetChanged()
-                }
-            }
-        })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { posts ->
+                    posts?.let {
+                        adapter.posts = posts
+                        adapter.notifyDataSetChanged()
+                    }
+                },
+                { Toast.makeText(this@MainActivity, it.message, Toast.LENGTH_LONG).show() }
+
+            )
     }
 }
